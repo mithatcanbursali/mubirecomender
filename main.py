@@ -1,4 +1,9 @@
 import requests
+from flask import Flask, jsonify
+
+app = Flask(__name__)
+
+filmInfos = []
 
 r=requests.get("https://api.mubi.com/v4/collections/trending", headers={"Client-Country":"TR","Client":"web"})
 films = r.json()["films"]
@@ -22,6 +27,15 @@ for film in films:
         filmGenre = film["genres"]
         filmDescription = film["short_synopsis"]
         filmWebURL = film["web_url"]
-        print(f"Film Adı:{orig_title}, IMDB Puanı:{imdbRating}, Mubi Puanı:{mubiRating}, Ortalama Puan:{averageRating_floated}, Yönetmen:{filmDirector}")
-        print(f"Film Resim URL: {filmImg}, Hex: {filmColor}, Süre:{filmDuration}, Tür:{filmGenre}, Açıklama:{filmDescription}, Web URL:{filmWebURL}")
+
+        new_film = {"filmName": orig_title, "filmYear": mov_year, "mubiRating": mubiRating, "imdbRating":imdbRating, "averageRating":averageRating_floated, "filmImg":filmImg, "filmDirector":filmDirector, "filmGenre":filmGenre,"filmColor":filmColor,"fiLmDuration":filmDuration,"filmDescription":filmDescription,"filmWebUrl":filmWebURL}
+        filmInfos.append(new_film)
+
+@app.route('/films', methods=['GET'])
+def get_films():
+    return jsonify(filmInfos)
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=8080)
+
 
